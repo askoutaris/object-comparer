@@ -1,4 +1,4 @@
-# type-signature
+# object-comparer
 Compares the contents of two same objects and extracts the differences
 
 ### ObjectComparer Usage
@@ -59,6 +59,12 @@ namespace Workbench
 			Console.ReadLine();
 		}
 	}
+	
+	// Output
+	// New name Name
+	// Name Name2 bigger than Name!
+	// Added item 5
+	// Removed item 2
 
 	public class BiggerNameDifference : IDifference
 	{
@@ -89,10 +95,4 @@ namespace Workbench
 		public string City { get; set; }
 	}
 }
-
-// Output
-// New name Name
-// Name Name2 bigger than Name!
-// Added item 5
-// Removed item 2
 ```
