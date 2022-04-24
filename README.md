@@ -61,10 +61,10 @@ namespace Workbench
 	}
 	
 	// Output
-	// New name Name
-	// Name Name2 bigger than Name!
-	// Added item 5
-	// Removed item 2
+	// The new name is Name2
+	// Name "Name2" is bigger than "Name"
+	// Address added addressId: 5 city: City5
+	// Address removed addressId: 2 city: City2
 
 	public class BiggerNameDifference : IDifference
 	{

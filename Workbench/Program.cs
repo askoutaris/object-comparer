@@ -11,8 +11,8 @@ namespace Workbench
 			{
 				Name = "Name",
 				Addresses = new Address[] {
-					new Address{ Id = 1, City = "City" },
-					new Address{ Id = 5, City = "City" }
+					new Address{ Id = 1, City = "City1" },
+					new Address{ Id = 5, City = "City5" }
 				}
 			};
 
@@ -20,8 +20,8 @@ namespace Workbench
 			{
 				Name = "Name2",
 				Addresses = new Address[] {
-					new Address{ Id = 1, City = "City2" },
-					new Address{ Id = 2, City = "City" }
+					new Address{ Id = 1, City = "City1.1" },
+					new Address{ Id = 2, City = "City2" }
 				}
 			};
 
@@ -29,7 +29,7 @@ namespace Workbench
 
 			comparer.AddRule(
 				condition: (source, target) => source.Name != target.Name,
-				differenceFactory: (source, target) => new GenericDifference($"New name {source.Name}"));
+				differenceFactory: (source, target) => new GenericDifference($"The new name is {target.Name}"));
 
 			comparer.AddRule(
 				condition: (source, target) => source.Name != target.Name && source.Name.Length < target.Name.Length,
@@ -38,12 +38,12 @@ namespace Workbench
 			comparer.AddRuleForEach(
 			 	itemsSelector: person => person.Addresses,
 				matchingPredicate: (sourceAddress, targetAddress) => sourceAddress.Id == targetAddress.Id,
-				addedFactory: (source, target, targetAddressAdded) => new GenericDifference($"Added item {targetAddressAdded.Id}"),
-				removedFactory: (source, target, targetAddressRemoved) => new GenericDifference($"Removed item {targetAddressRemoved.Id}"),
+				addedFactory: (source, target, targetAddressAdded) => new GenericDifference($"Address added addressId: {targetAddressAdded.Id} city: {targetAddressAdded.City}"),
+				removedFactory: (source, target, targetAddressRemoved) => new GenericDifference($"Address removed addressId: {targetAddressRemoved.Id} city: {targetAddressRemoved.City}"),
 				configureComparer: itemComparer => itemComparer
 					.AddRule(
 						condition: (sourceAddress, targetAddress) => sourceAddress.City != targetAddress.City,
-						differenceFactory: (sourceAddress, targetAddress) => new GenericDifference($"New cituy name is {sourceAddress.City} for id {sourceAddress.Id}"))
+						differenceFactory: (sourceAddress, targetAddress) => new GenericDifference($"New city name is {sourceAddress.City} for id {sourceAddress.Id}"))
 				);
 
 			IDifference[] differences = comparer.Compare(person1, person2);
@@ -68,7 +68,7 @@ namespace Workbench
 
 		public override string ToString()
 		{
-			return $"Name {NewName} bigger than {OldName}!";
+			return $"Name \"{NewName}\" is bigger than \"{OldName}\"";
 		}
 	}
 
