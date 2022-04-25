@@ -48,8 +48,8 @@ namespace ObjectComparer
 
 					if (matchedItem != null && ItemComparer != null)
 						differences.AddRange(ItemComparer.Compare(sourceItem, matchedItem));
-					else if (matchedItem == null && AddedFactory != null)
-						differences.Add(AddedFactory(source, target, sourceItem));
+					else if (matchedItem == null && RemovedFactory != null)
+						differences.Add(RemovedFactory(source, target, sourceItem));
 				}
 
 				foreach (var targetItem in targetItems)
@@ -64,8 +64,8 @@ namespace ObjectComparer
 						}
 					}
 
-					if (matchedItem == null && RemovedFactory != null)
-						differences.Add(RemovedFactory(source, target, targetItem));
+					if (matchedItem == null && AddedFactory != null)
+						differences.Add(AddedFactory(source, target, targetItem));
 				}
 
 				return differences.ToArray();
