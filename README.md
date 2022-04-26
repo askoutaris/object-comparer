@@ -79,7 +79,7 @@ namespace Workbench
 
 		public override string ToString()
 		{
-			return $"Name {NewName} bigger than {OldName}!";
+			return $"Name "{NewName}" is bigger than {OldName}";
 		}
 	}
 
