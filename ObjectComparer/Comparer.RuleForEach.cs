@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ObjectComparer
 {
@@ -36,15 +37,7 @@ namespace ObjectComparer
 				var differences = new List<IDifference>();
 				foreach (var sourceItem in sourceItems)
 				{
-					TItem? matchedItem = default;
-					foreach (var targetItem in targetItems)
-					{
-						if (MatchingPredicate(sourceItem, targetItem))
-						{
-							matchedItem = targetItem;
-							break;
-						}
-					}
+					TItem? matchedItem = targetItems.SingleOrDefault(targetItem => MatchingPredicate(sourceItem, targetItem));
 
 					if (matchedItem != null && ItemComparer != null)
 						differences.AddRange(ItemComparer.Compare(sourceItem, matchedItem));
@@ -54,15 +47,7 @@ namespace ObjectComparer
 
 				foreach (var targetItem in targetItems)
 				{
-					TItem? matchedItem = default;
-					foreach (var sourceItem in sourceItems)
-					{
-						if (MatchingPredicate(targetItem, sourceItem))
-						{
-							matchedItem = sourceItem;
-							break;
-						}
-					}
+					TItem? matchedItem = sourceItems.SingleOrDefault(sourceItem => MatchingPredicate(targetItem, sourceItem));
 
 					if (matchedItem == null && AddedFactory != null)
 						differences.Add(AddedFactory(source, target, targetItem));
