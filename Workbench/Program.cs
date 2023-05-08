@@ -12,16 +12,18 @@ namespace Workbench
 				Name = "Name",
 				Addresses = new Address[] {
 					new Address{ Id = 1, City = "City1" },
-					new Address{ Id = 5, City = "City5" }
+					new Address{ Id = 3, City = "City3" },
+					new Address{ Id = 4, City = "City4" },
 				}
 			};
 
 			var person2 = new Person
 			{
-				Name = "Name2",
+				Name = "NameLonger",
 				Addresses = new Address[] {
-					new Address{ Id = 1, City = "City1.1" },
-					new Address{ Id = 2, City = "City2" }
+					new Address{ Id = 2, City = "City2" },
+					new Address{ Id = 3, City = "City33" },
+					new Address{ Id = 4, City = "City4" },
 				}
 			};
 
@@ -33,7 +35,7 @@ namespace Workbench
 
 			comparer.AddRule(
 				condition: (source, target) => source.Name != target.Name && source.Name.Length < target.Name.Length,
-				differenceFactory: (source, target) => new BiggerNameDifference(source.Name, target.Name));
+				differenceFactory: (source, target) => new LongerNameDifference(source.Name, target.Name));
 
 			comparer.AddRuleForEach(
 			 	itemsSelector: person => person.Addresses,
@@ -55,12 +57,12 @@ namespace Workbench
 		}
 	}
 
-	public class BiggerNameDifference : IDifference
+	public class LongerNameDifference : IDifference
 	{
 		public string OldName { get; }
 		public string NewName { get; }
 
-		public BiggerNameDifference(string oldName, string newName)
+		public LongerNameDifference(string oldName, string newName)
 		{
 			OldName = oldName;
 			NewName = newName;

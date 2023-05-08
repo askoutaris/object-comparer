@@ -31,11 +31,17 @@ namespace ObjectComparer
 				Func<TItem, TItem, bool> matchingPredicate,
 				Func<T, T, TItem, IDifference>? addedFactory = null,
 				Func<T, T, TItem, IDifference>? removedFactory = null,
-				Action<Comparer<TItem>>? configureComparer = null
-			)
+				Action<Comparer<TItem>>? configureComparer = null)
 		{
-			var itemComparer = configureComparer == null ? null : new Comparer<TItem>();
+			Comparer<TItem>? itemComparer = null;
+			if (configureComparer is not null)
+			{
+				itemComparer = new Comparer<TItem>();
+				configureComparer(itemComparer);
+			}
+
 			_rules.Add(new RuleForEach<TItem>(itemsSelector, matchingPredicate, addedFactory, removedFactory, itemComparer));
+
 			return this;
 		}
 
