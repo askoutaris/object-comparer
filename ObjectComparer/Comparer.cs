@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace ObjectComparer
 {
-	public interface IComparer<T>
+	public interface IComparer<TType, TDiff>
 	{
-		Comparer<T> AddRule(Func<T, T, bool> condition, Func<T, T, IDifference> differenceFactory);
-		Comparer<T> AddRuleForEach<TItem>(Func<T, IEnumerable<TItem>> itemsSelector, Func<TItem, TItem, bool> matchingPredicate, Func<T, T, TItem, IDifference>? addedFactory = null, Func<T, T, TItem, IDifference>? removedFactory = null, Action<Comparer<TItem>>? configureComparer = null);
-		IDifference[] Compare(T source, T target);
+		Comparer<TType, TDiff> AddRule(Func<TType, TType, bool> condition, Func<TType, TType, TDiff> differenceFactory);
+		Comparer<TType, TDiff> AddRuleForEach<TItem>(Func<TType, IEnumerable<TItem>> itemsSelector, Func<TItem, TItem, bool> matchingPredicate, Func<TType, TType, TItem, TDiff>? addedFactory = null, Func<TType, TType, TItem, TDiff>? removedFactory = null, Action<Comparer<TItem, TDiff>>? configureComparer = null);
+		TDiff[] Compare(TType source, TType target);
 	}
 
-	public partial class Comparer<T> : IComparer<T>
+	public partial class Comparer<TType, TDiff> : IComparer<TType, TDiff>
 	{
 		private readonly List<IRule> _rules;
 
@@ -20,23 +20,23 @@ namespace ObjectComparer
 			_rules = new List<IRule>();
 		}
 
-		public Comparer<T> AddRule(Func<T, T, bool> condition, Func<T, T, IDifference> differenceFactory)
+		public Comparer<TType, TDiff> AddRule(Func<TType, TType, bool> condition, Func<TType, TType, TDiff> differenceFactory)
 		{
 			_rules.Add(new Rule(condition, differenceFactory));
 			return this;
 		}
 
-		public Comparer<T> AddRuleForEach<TItem>(
-				Func<T, IEnumerable<TItem>> itemsSelector,
+		public Comparer<TType, TDiff> AddRuleForEach<TItem>(
+				Func<TType, IEnumerable<TItem>> itemsSelector,
 				Func<TItem, TItem, bool> matchingPredicate,
-				Func<T, T, TItem, IDifference>? addedFactory = null,
-				Func<T, T, TItem, IDifference>? removedFactory = null,
-				Action<Comparer<TItem>>? configureComparer = null)
+				Func<TType, TType, TItem, TDiff>? addedFactory = null,
+				Func<TType, TType, TItem, TDiff>? removedFactory = null,
+				Action<Comparer<TItem, TDiff>>? configureComparer = null)
 		{
-			Comparer<TItem>? itemComparer = null;
+			Comparer<TItem, TDiff>? itemComparer = null;
 			if (configureComparer is not null)
 			{
-				itemComparer = new Comparer<TItem>();
+				itemComparer = new Comparer<TItem, TDiff>();
 				configureComparer(itemComparer);
 			}
 
@@ -45,7 +45,7 @@ namespace ObjectComparer
 			return this;
 		}
 
-		public IDifference[] Compare(T source, T target)
+		public TDiff[] Compare(TType source, TType target)
 		{
 			return _rules
 				.SelectMany(rule => rule.Compare(source, target))

@@ -5,22 +5,22 @@ using System.Linq;
 namespace ObjectComparer
 {
 
-	public partial class Comparer<T>
+	public partial class Comparer<TType, TDiff>
 	{
 		class RuleForEach<TItem> : IRule
 		{
-			public Func<T, IEnumerable<TItem>> ItemsSelector { get; }
+			public Func<TType, IEnumerable<TItem>> ItemsSelector { get; }
 			public Func<TItem, TItem, bool> MatchingPredicate { get; }
-			public Func<T, T, TItem, IDifference>? AddedFactory { get; }
-			public Func<T, T, TItem, IDifference>? RemovedFactory { get; }
-			public Comparer<TItem>? ItemComparer { get; }
+			public Func<TType, TType, TItem, TDiff>? AddedFactory { get; }
+			public Func<TType, TType, TItem, TDiff>? RemovedFactory { get; }
+			public Comparer<TItem, TDiff>? ItemComparer { get; }
 
 			public RuleForEach(
-				Func<T, IEnumerable<TItem>> itemsSelector,
+				Func<TType, IEnumerable<TItem>> itemsSelector,
 				Func<TItem, TItem, bool> matchingPredicate,
-				Func<T, T, TItem, IDifference>? addedFactory,
-				Func<T, T, TItem, IDifference>? removedFactory,
-				Comparer<TItem>? itemComparer)
+				Func<TType, TType, TItem, TDiff>? addedFactory,
+				Func<TType, TType, TItem, TDiff>? removedFactory,
+				Comparer<TItem, TDiff>? itemComparer)
 			{
 				ItemsSelector = itemsSelector;
 				MatchingPredicate = matchingPredicate;
@@ -29,12 +29,12 @@ namespace ObjectComparer
 				ItemComparer = itemComparer;
 			}
 
-			public IDifference[] Compare(T source, T target)
+			public TDiff[] Compare(TType source, TType target)
 			{
 				var sourceItems = ItemsSelector(source);
 				var targetItems = ItemsSelector(target);
 
-				var differences = new List<IDifference>();
+				var differences = new List<TDiff>();
 				foreach (var sourceItem in sourceItems)
 				{
 					TItem? matchedItem = targetItems.SingleOrDefault(targetItem => MatchingPredicate(sourceItem, targetItem));
