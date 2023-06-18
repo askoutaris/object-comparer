@@ -27,11 +27,11 @@ namespace ObjectComparer
 		}
 
 		public Comparer<TType, TDiff> AddRuleForEach<TItem>(
-				Func<TType, IEnumerable<TItem>> itemsSelector,
-				Func<TItem, TItem, bool> matchingPredicate,
-				Func<TType, TType, TItem, TDiff>? addedFactory = null,
-				Func<TType, TType, TItem, TDiff>? removedFactory = null,
-				Action<Comparer<TItem, TDiff>>? configureComparer = null)
+			Func<TType, IEnumerable<TItem>> itemsSelector,
+			Func<TItem, TItem, bool> matchingPredicate,
+			Func<TType, TType, TItem, TDiff>? addedFactory = null,
+			Func<TType, TType, TItem, TDiff>? removedFactory = null,
+			Action<Comparer<TItem, TDiff>>? configureComparer = null)
 		{
 			Comparer<TItem, TDiff>? itemComparer = null;
 			if (configureComparer is not null)

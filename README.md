@@ -32,7 +32,7 @@ namespace Workbench
 				}
 			};
 
-			IComparer<Person> comparer = new Comparer<Person>();
+			IComparer<Person, DifferenceBase> comparer = new Comparer<Person, DifferenceBase>();
 
 			comparer.AddRule(
 				condition: (source, target) => source.Name != target.Name,
@@ -53,7 +53,7 @@ namespace Workbench
 						differenceFactory: (sourceAddress, targetAddress) => new GenericDifference($"New city name is {sourceAddress.City} for id {sourceAddress.Id}"))
 				);
 
-			IDifference[] differences = comparer.Compare(person1, person2);
+			DifferenceBase[] differences = comparer.Compare(person1, person2);
 
 			foreach (var dif in differences)
 				Console.WriteLine(dif.ToString());
@@ -61,15 +61,27 @@ namespace Workbench
 			Console.ReadLine();
 		}
 	}
-	
-	// Output
-	// The new name is NameLonger
-	// Name "NameLonger" is bigger than "Name"
-	// Address removed addressId: 1 city: City1
-	// New city name is City3 for id 3
-	// Address added addressId: 2 city: City2
 
-	public class LongerNameDifference : IDifference
+	public abstract class DifferenceBase
+	{
+	}
+
+	public class GenericDifference : DifferenceBase
+	{
+		public string Message { get; }
+
+		public GenericDifference(string message)
+		{
+			Message = message;
+		}
+
+		public override string ToString()
+		{
+			return Message;
+		}
+	}
+
+	public class LongerNameDifference : DifferenceBase
 	{
 		public string OldName { get; }
 		public string NewName { get; }
