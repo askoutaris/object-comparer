@@ -1,7 +1,34 @@
-# object-comparer
-Compares the contents of two same objects and extracts the differences
+# ObjectComparer
 
-### ObjectComparer Usage
+A flexible .NET library for comparing two objects of the same type and extracting differences based on configurable rules.
+
+## Overview
+
+ObjectComparer allows you to define custom comparison rules for objects and their nested collections. Instead of prescribing specific difference types, the library is fully generic - you define your own difference classes that fit your domain needs.
+
+**Key Features:**
+- Rule-based comparison system with fluent API
+- Support for simple property comparisons
+- Support for collection comparisons with add/remove/change detection
+- Recursive comparison for nested collections
+- Fully generic - define your own difference types
+- Targets .NET Standard 2.0 for broad compatibility
+
+## Installation
+
+```
+dotnet add package ObjectComparer
+```
+
+Or via NuGet Package Manager:
+```
+Install-Package ObjectComparer
+```
+
+## Usage
+
+### Basic Example
+
 ```csharp
 using System;
 using ObjectComparer;
@@ -34,14 +61,17 @@ namespace Workbench
 
 			IComparer<Person, DifferenceBase> comparer = new Comparer<Person, DifferenceBase>();
 
+			// Add a simple property comparison rule
 			comparer.AddRule(
 				condition: (source, target) => source.Name != target.Name,
 				differenceFactory: (source, target) => new GenericDifference($"The new name is {target.Name}"));
 
+			// Add another rule with more specific condition
 			comparer.AddRule(
 				condition: (source, target) => source.Name != target.Name && source.Name.Length < target.Name.Length,
 				differenceFactory: (source, target) => new LongerNameDifference(source.Name, target.Name));
 
+			// Add a collection comparison rule with nested comparer
 			comparer.AddRuleForEach(
 			 	itemsSelector: person => person.Addresses,
 				matchingPredicate: (sourceAddress, targetAddress) => sourceAddress.Id == targetAddress.Id,
@@ -62,6 +92,7 @@ namespace Workbench
 		}
 	}
 
+	// Define your own difference types
 	public abstract class DifferenceBase
 	{
 	}
@@ -111,3 +142,67 @@ namespace Workbench
 	}
 }
 ```
+
+## How It Works
+
+### Simple Rules
+
+Use `AddRule()` to compare simple properties:
+
+```csharp
+comparer.AddRule(
+    condition: (source, target) => source.PropertyName != target.PropertyName,
+    differenceFactory: (source, target) => new MyDifference("Property changed")
+);
+```
+
+### Collection Rules
+
+Use `AddRuleForEach()` to compare collections:
+
+```csharp
+comparer.AddRuleForEach(
+    itemsSelector: obj => obj.Collection,           // Select the collection to compare
+    matchingPredicate: (s, t) => s.Id == t.Id,      // How to match items (must be unique!)
+    addedFactory: (s, t, added) => new MyDiff(),    // Factory for added items
+    removedFactory: (s, t, removed) => new MyDiff(), // Factory for removed items
+    configureComparer: nested => nested.AddRule(...) // Optional: compare matched items
+);
+```
+
+**Important:** The `matchingPredicate` must uniquely identify items (like a primary key). The library uses `SingleOrDefault` internally to ensure uniqueness.
+
+### Rule Evaluation
+
+- Rules are evaluated in the order they are added
+- Multiple rules can produce differences for the same comparison
+- All differences are aggregated into a single array result
+
+## Building from Source
+
+Build the solution:
+```bash
+dotnet build ObjectComparer.sln
+```
+
+Run the demo workbench:
+```bash
+dotnet run --project Workbench/Workbench.csproj
+```
+
+Pack for NuGet:
+```bash
+dotnet pack ObjectComparer/ObjectComparer.csproj -c Release
+```
+
+## License
+
+MIT License - see the project file for details
+
+## Author
+
+Alkiviadis Skoutaris
+
+## Repository
+
+https://github.com/askoutaris/object-comparer
