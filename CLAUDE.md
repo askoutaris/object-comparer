@@ -50,26 +50,39 @@ dotnet test Tests/Tests.csproj
 
 ### Core Design Pattern
 
-The library uses a **rule-based comparison system** with two main rule types:
+The library uses a **rule-based comparison system** with three rule types:
 
 1. **Simple Rules** (`Rule` class in `Comparer.Rule.cs`): Compare top-level properties of objects
    - Takes a condition function `(source, target) => bool`
    - Takes a difference factory function `(source, target) => TDiff`
    - Returns a difference object when condition is met
 
-2. **Collection Rules** (`RuleForEach<TItem>` class in `Comparer.RuleForEach.cs`): Compare collections within objects
+2. **Collection Rules with Predicate** (`RuleForEach<TItem>` class in `Comparer.RuleForEach.cs`): Compare collections using custom matching logic
    - Selects a collection from both source and target objects
    - Uses a matching predicate to pair items between collections
    - Detects added items, removed items, and changed items
    - Can recursively apply nested comparers to matched items
-   - **Important**: Uses `SingleOrDefault` with the matching predicate to ensure uniqueness - the predicate must identify items uniquely (like a key)
+   - **Performance**: O(n²) complexity - uses `SingleOrDefault` with the matching predicate to find matches
+   - **Important**: The predicate must identify items uniquely or throws InvalidOperationException
+   - **Use case**: Complex matching logic beyond simple key equality (e.g., composite keys, fuzzy matching)
+
+3. **Collection Rules with Key Selector** (`RuleForEachWithKey<TItem, TKey>` class in `Comparer.RuleForEachWithKey.cs`): Compare collections using unique keys
+   - Selects a collection from both source and target objects
+   - Uses a key selector function to extract keys from items
+   - Builds dictionaries for O(1) lookups, providing O(n) overall performance
+   - Detects added items, removed items, and changed items
+   - Can recursively apply nested comparers to matched items
+   - **Performance**: O(n) complexity - uses dictionary-based matching for efficient lookups
+   - **Important**: Keys must be unique within each collection or throws ArgumentException
+   - **Use case**: Matching by unique keys (e.g., Id properties) when performance matters
 
 ### Key Classes
 
 - `Comparer<TType, TDiff>`: Main entry point implementing `IComparer<TType, TDiff>`
   - Maintains a list of `IRule` instances
   - `AddRule()`: Adds simple comparison rules
-  - `AddRuleForEach()`: Adds collection comparison rules with optional nested comparer
+  - `AddRuleForEach()` with `matchingPredicate`: Adds collection comparison rules using custom predicate logic (O(n²))
+  - `AddRuleForEach()` with `keySelector`: Adds collection comparison rules using unique keys for efficient dictionary lookups (O(n))
   - `Compare()`: Executes all rules and returns aggregated differences
 
 - `IRule` (internal interface): Common interface for all rule types
@@ -78,10 +91,11 @@ The library uses a **rule-based comparison system** with two main rule types:
 ### Partial Class Structure
 
 The `Comparer<TType, TDiff>` class is split across multiple files using partial classes:
-- `Comparer.cs`: Main class definition and public API
+- `Comparer.cs`: Main class definition and public API methods
 - `Comparer.IRule.cs`: Internal `IRule` interface definition
-- `Comparer.Rule.cs`: Simple rule implementation
-- `Comparer.RuleForEach.cs`: Collection rule implementation
+- `Comparer.Rule.cs`: Simple rule implementation for property comparisons
+- `Comparer.RuleForEach.cs`: Collection rule implementation using matching predicates (O(n²))
+- `Comparer.RuleForEachWithKey.cs`: Collection rule implementation using key selectors (O(n))
 
 ### Generic Difference Pattern
 
@@ -93,13 +107,31 @@ The library does NOT define concrete difference types. Instead:
 
 See README.md for a complete usage example demonstrating this pattern with an `IDifference` interface.
 
+## Testing
+
+The project has comprehensive test coverage with 40+ unit and integration tests organized into:
+- `RuleTests.cs`: Tests for simple property comparison rules
+- `RuleForEachTests.cs`: Tests for collection rules with matching predicates
+- `RuleForEachWithKeyTests.cs`: Tests for collection rules with key selectors (including performance tests)
+- `ComparerIntegrationTests.cs`: Integration tests combining multiple rule types
+- `TestModels.cs`: Shared test models and difference types
+
+Test coverage: 100% line coverage, 100% branch coverage
+
+Run tests with coverage:
+```bash
+dotnet test /p:CollectCoverage=true
+```
+
 ## Important Implementation Notes
 
 - `RuleForEach` executes its matching predicate using `SingleOrDefault()` to ensure each item has at most one match
+- `RuleForEachWithKey` builds dictionaries for O(1) lookups, throwing ArgumentException if duplicate keys are found
 - Rules are evaluated in the order they are added
 - Multiple rules can produce differences for the same comparison
 - All differences are aggregated and returned as an array
 - The library targets .NET Standard 2.0 for broad compatibility
+- All public APIs and classes have XML documentation for IntelliSense support
 
 ## Repository Information
 
