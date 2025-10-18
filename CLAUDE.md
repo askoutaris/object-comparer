@@ -10,8 +10,9 @@ Target framework: .NET Standard 2.0 (C# 9)
 
 ## Project Structure
 
-- `ObjectComparer/` - The main library project (NuGet package)
+- `ObjectComparer/` - The main library project (NuGet package, .NET Standard 2.0)
 - `Workbench/` - Console application for testing/demonstration purposes (.NET Core 3.1)
+- `Tests/` - xUnit test project (.NET 8.0)
 
 ## Build and Development Commands
 
@@ -33,6 +34,16 @@ dotnet run --project Workbench/Workbench.csproj
 Pack the library for NuGet distribution:
 ```
 dotnet pack ObjectComparer/ObjectComparer.csproj -c Release
+```
+
+Run all tests:
+```
+dotnet test
+```
+
+Run tests in a specific project:
+```
+dotnet test Tests/Tests.csproj
 ```
 
 ## Architecture
@@ -75,12 +86,12 @@ The `Comparer<TType, TDiff>` class is split across multiple files using partial 
 ### Generic Difference Pattern
 
 The library does NOT define concrete difference types. Instead:
-- Consumers define their own difference base class/interface (e.g., `DifferenceBase`)
-- Consumers create specific difference types that inherit from this base
+- Consumers define their own difference base class or interface (e.g., `IDifference` interface or `DifferenceBase` abstract class)
+- Consumers create specific difference types that implement/inherit from this base
 - The comparer is instantiated as `Comparer<TObjectType, TDifferenceType>`
 - Rules provide factory functions that create the appropriate difference instances
 
-See README.md for a complete usage example demonstrating this pattern.
+See README.md for a complete usage example demonstrating this pattern with an `IDifference` interface.
 
 ## Important Implementation Notes
 

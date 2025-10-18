@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet --version:*)"
+      "Bash(dotnet --version:*)",
+      "Bash(dotnet test:*)",
+      "Bash(Get-ChildItem -Path \"Tests\\TestResults\" -Filter \"coverage.cobertura.xml\" -Recurse)",
+      "Bash(Select-Object -First 1)",
+      "Bash(Get-Content)"
     ],
     "deny": [],
     "ask": []
