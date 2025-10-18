@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace ObjectComparer
+﻿namespace ObjectComparer
 {
-
 	public partial class Comparer<TType, TDiff>
 	{
 		class RuleForEach<TItem> : IRule

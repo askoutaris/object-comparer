@@ -3,7 +3,8 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Nullable>enable</Nullable>
-		<LangVersion>9</LangVersion>
+		<LangVersion>Latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Authors>Alkiviadis Skoutaris</Authors>
 		<Company>Alkiviadis Skoutaris</Company>
 		<Description>Compares the data of two object</Description>

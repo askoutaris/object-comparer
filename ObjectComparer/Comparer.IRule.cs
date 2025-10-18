@@ -1,6 +1,5 @@
 ﻿namespace ObjectComparer
 {
-
 	public partial class Comparer<TType, TDiff>
 	{
 		interface IRule

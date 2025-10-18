@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace ObjectComparer
+﻿namespace ObjectComparer
 {
-
 	public partial class Comparer<TType, TDiff>
 	{
 		class Rule : IRule
