@@ -5,7 +5,8 @@
       "Bash(dotnet test:*)",
       "Bash(Get-ChildItem -Path \"Tests\\TestResults\" -Filter \"coverage.cobertura.xml\" -Recurse)",
       "Bash(Select-Object -First 1)",
-      "Bash(Get-Content)"
+      "Bash(Get-Content)",
+      "Bash(dotnet build:*)"
     ],
     "deny": [],
     "ask": []

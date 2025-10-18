@@ -1,11 +1,10 @@
-﻿using System;
-using ObjectComparer;
+﻿using ObjectComparer;
 
 namespace Workbench
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main(string[] _)
 		{
 			var person1 = new Person
 			{
@@ -37,9 +36,22 @@ namespace Workbench
 				condition: (source, target) => source.Name != target.Name && source.Name.Length < target.Name.Length,
 				differenceFactory: (source, target) => new LongerNameDifference(source.Name, target.Name));
 
+			// Matching with matchingPredicate
 			comparer.AddRuleForEach(
 			 	itemsSelector: person => person.Addresses,
 				matchingPredicate: (sourceAddress, targetAddress) => sourceAddress.Id == targetAddress.Id,
+				addedFactory: (source, target, targetAddressAdded) => new GenericDifference($"Address added addressId: {targetAddressAdded.Id} city: {targetAddressAdded.City}"),
+				removedFactory: (source, target, targetAddressRemoved) => new GenericDifference($"Address removed addressId: {targetAddressRemoved.Id} city: {targetAddressRemoved.City}"),
+				configureComparer: itemComparer => itemComparer
+					.AddRule(
+						condition: (sourceAddress, targetAddress) => sourceAddress.City != targetAddress.City,
+						differenceFactory: (sourceAddress, targetAddress) => new GenericDifference($"New city name is {sourceAddress.City} for id {sourceAddress.Id}"))
+				);
+
+			// Matching with keySelector
+			comparer.AddRuleForEach(
+			 	itemsSelector: person => person.Addresses,
+				keySelector: address => address.Id,
 				addedFactory: (source, target, targetAddressAdded) => new GenericDifference($"Address added addressId: {targetAddressAdded.Id} city: {targetAddressAdded.City}"),
 				removedFactory: (source, target, targetAddressRemoved) => new GenericDifference($"Address removed addressId: {targetAddressRemoved.Id} city: {targetAddressRemoved.City}"),
 				configureComparer: itemComparer => itemComparer
@@ -55,53 +67,5 @@ namespace Workbench
 
 			Console.ReadLine();
 		}
-	}
-
-	public interface IDifference
-	{
-	}
-
-	public class GenericDifference : IDifference
-	{
-		public string Message { get; }
-
-		public GenericDifference(string message)
-		{
-			Message = message;
-		}
-
-		public override string ToString()
-		{
-			return Message;
-		}
-	}
-
-	public class LongerNameDifference : IDifference
-	{
-		public string OldName { get; }
-		public string NewName { get; }
-
-		public LongerNameDifference(string oldName, string newName)
-		{
-			OldName = oldName;
-			NewName = newName;
-		}
-
-		public override string ToString()
-		{
-			return $"Name \"{NewName}\" is bigger than \"{OldName}\"";
-		}
-	}
-
-	public class Person
-	{
-		public string Name { get; set; }
-		public Address[] Addresses { get; set; }
-	}
-
-	public class Address
-	{
-		public int Id { get; set; }
-		public string City { get; set; }
 	}
 }
