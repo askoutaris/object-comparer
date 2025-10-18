@@ -27,7 +27,7 @@ namespace Workbench
 				}
 			};
 
-			IComparer<Person, DifferenceBase> comparer = new Comparer<Person, DifferenceBase>();
+			IComparer<Person, IDifference> comparer = new Comparer<Person, IDifference>();
 
 			comparer.AddRule(
 				condition: (source, target) => source.Name != target.Name,
@@ -48,7 +48,7 @@ namespace Workbench
 						differenceFactory: (sourceAddress, targetAddress) => new GenericDifference($"New city name is {sourceAddress.City} for id {sourceAddress.Id}"))
 				);
 
-			DifferenceBase[] differences = comparer.Compare(person1, person2);
+			IDifference[] differences = comparer.Compare(person1, person2);
 
 			foreach (var dif in differences)
 				Console.WriteLine(dif.ToString());
@@ -57,11 +57,11 @@ namespace Workbench
 		}
 	}
 
-	public abstract class DifferenceBase
+	public interface IDifference
 	{
 	}
 
-	public class GenericDifference : DifferenceBase
+	public class GenericDifference : IDifference
 	{
 		public string Message { get; }
 
@@ -76,7 +76,7 @@ namespace Workbench
 		}
 	}
 
-	public class LongerNameDifference : DifferenceBase
+	public class LongerNameDifference : IDifference
 	{
 		public string OldName { get; }
 		public string NewName { get; }
