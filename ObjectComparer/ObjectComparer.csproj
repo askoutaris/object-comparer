@@ -11,8 +11,15 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/askoutaris/object-comparer</RepositoryUrl>
-		<Version>1.2.0</Version>
+		<Version>1.2.1</Version>
+		<PackageReleaseNotes>Set GenerateDocumentationFile to true so that nugets will contain documentation comments</PackageReleaseNotes>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectCapability Include="DynamicDependentFile" />
